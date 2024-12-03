@@ -4,7 +4,7 @@
  * @Author: Hanbaka
  * @Date: 2024-07-04 02:45:12
  * @LastEditors: Hanbaka
- * @LastEditTime: 2024-12-03 16:06:36
+ * @LastEditTime: 2024-12-03 16:14:17
 -->
 简体中文 
 
@@ -13,7 +13,7 @@
 本项目基于原项目进行更改，原项目作者已停止维护，后续如果有空会基于原项目进行重构
 
 原项目地址: 
-[無名の主页](https://www.imsyy.top)
+[無名の主页](https://github.com/imsyy/home)
 
 ![無名の主页](/screenshots/main.jpg)
 
