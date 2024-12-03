@@ -10,7 +10,7 @@
 
 <p>
 <strong><h2>博客主页</h2></strong>
-原项目地址：[無名の主页](https://github.com/imsyy/home)
+原项目地址：![無名の主页](https://github.com/imsyy/home)
 本项目基于原项目进行更改，原项目作者已停止维护，后续如果有空会基于原项目进行重构
 </p>
 
