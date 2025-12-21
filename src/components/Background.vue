@@ -40,13 +40,11 @@ const bgRandom = Math.floor(Math.random() * 10 + 1);
 // 主备图源尝试机制
 const tryUrls = ref([]);
 const currentTryIndex = ref(0);
-
 const trySetBg = (urls) => {
   tryUrls.value = urls;
   currentTryIndex.value = 0;
   tryLoadUrl();
 };
-
 const tryLoadUrl = () => {
   const url = tryUrls.value[currentTryIndex.value];
   const img = new Image();
@@ -56,18 +54,16 @@ const tryLoadUrl = () => {
   img.onerror = () => {
     currentTryIndex.value++;
     if (currentTryIndex.value < tryUrls.value.length) {
+      imgTry();
       tryLoadUrl(); // 尝试下一个接口
-      console.log("");
-      
     } else {
       // 全部失败，使用本地默认图
-      bgUrl.value = `/images/background${bgRandom}.jpg`;
+      // bgUrl.value = `/images/background${bgRandom}.jpg`;
+      imgLoadError();
     }
   };
   img.src = url;
 };
-
-// 更换壁纸逻辑
 const changeBg = (type) => {
   if (type == 0) {
     bgUrl.value = `/images/background${bgRandom}.jpg`;
@@ -75,13 +71,13 @@ const changeBg = (type) => {
     // Bing 高清壁纸
     trySetBg([
       "https://bing.img.run/1920x1080.php",
-      "https://api.xsot.cn/bing?jump=true",
+      "https://api.vvhan.com/api/bing",
     ]);
   } else if (type == 2) {
     // Bing 随机壁纸
     trySetBg([
+      "https://api.vvhan.com/api/wallpaper/views",
       "https://bing.img.run/rand.php",
-      "https://api.btstu.cn/sjbz/api.php?lx=fengjing&format=images",
     ]);
   } else if (type == 3) {
     // 动漫类壁纸
@@ -95,25 +91,46 @@ const changeBg = (type) => {
 
 // 图片加载完成
 const imgLoadComplete = () => {
-  imgTimeout.value = setTimeout(() => {
-    store.setImgLoadStatus(true);
-  }, Math.floor(Math.random() * (600 - 300 + 1)) + 300);
+  imgTimeout.value = setTimeout(
+    () => {
+      store.setImgLoadStatus(true);
+    },
+    Math.floor(Math.random() * (600 - 300 + 1)) + 300,
+  );
 };
 
-// 动画完成
+// 图片动画完成
 const imgAnimationEnd = () => {
   console.log("壁纸加载且动画完成");
+  // 加载完成事件
   emit("loadComplete");
 };
 
-// 图片加载失败提示（无需再切换 bgUrl）
-const imgLoadError = () => {
-  console.error("壁纸加载失败，尝试备用地址中：", tryUrls.value[currentTryIndex.value]);
+//图片尝试切换接口
+const imgTry  = () => {
+  console.error("壁纸加载失败，尝试备用地址中：", bgUrl.value);
   ElMessage({
-    message: "壁纸加载失败，正在尝试备用地址...",
-    icon: h(Error, { theme: "filled", fill: "#efefef" }),
+    message: "壁纸加载失败，尝试备用地址中",
+    icon: h(Error, {
+      theme: "filled",
+      fill: "#efefef",
+    }),
   });
+  // bgUrl.value = `/images/background${bgRandom}.jpg`;
 };
+// 图片显示失败
+const imgLoadError = () => {
+  console.error("壁纸加载失败：", bgUrl.value);
+  ElMessage({
+    message: "壁纸加载失败，已临时切换回默认",
+    icon: h(Error, {
+      theme: "filled",
+      fill: "#efefef",
+    }),
+  });
+  bgUrl.value = `/images/background${bgRandom}.jpg`;
+};
+
 
 // 监听壁纸类型切换
 watch(
