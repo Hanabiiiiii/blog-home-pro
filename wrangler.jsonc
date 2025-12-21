@@ -1,14 +1,7 @@
 {
-<<<<<<< HEAD
-  "name": "homepage",
-  "compatibility_data": "2025-12-21",
-  "assets": {
-    "directory": "./dist"
-=======
   "name":"blog-home-pro",
   "compatibility_data":"2025-12-21",
   "assets":{
     "directory":"./dist"
->>>>>>> 8b9c085 (Add compatibility_date for Cloudflare Workers deployment)
   }
 }
