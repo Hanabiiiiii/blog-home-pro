@@ -104,10 +104,10 @@ const {
 } = storeToRefs(store);
 
 // 默认选中项
-const activeName = ref("1");
+const activeName = ref("0");
 // 页面挂载时设置默认壁纸为“随机动漫”
 onMounted(() => {
-  coverType.value = "1";
+  coverType.value = "0";
   // radioChange();
 });
 // 壁纸切换
