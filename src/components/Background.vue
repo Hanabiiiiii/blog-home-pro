@@ -57,6 +57,8 @@ const tryLoadUrl = () => {
     currentTryIndex.value++;
     if (currentTryIndex.value < tryUrls.value.length) {
       tryLoadUrl(); // 尝试下一个接口
+      console.log("");
+      
     } else {
       // 全部失败，使用本地默认图
       bgUrl.value = `/images/background${bgRandom}.jpg`;
@@ -84,6 +86,7 @@ const changeBg = (type) => {
   } else if (type == 3) {
     // 动漫类壁纸
     trySetBg([
+      "https://eopfapi.acofork.com/pic?img=ua",
       "https://api.btstu.cn/sjbz/api.php?lx=dongman&format=images",
       "https://api.mtyqx.cn/api/random.php",
     ]);

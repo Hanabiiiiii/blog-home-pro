@@ -107,7 +107,7 @@ const {
 const activeName = ref("0");
 // 页面挂载时设置默认壁纸为“随机动漫”
 onMounted(() => {
-  coverType.value = "0";
+  coverType.value = "3";
   // radioChange();
 });
 // 壁纸切换
