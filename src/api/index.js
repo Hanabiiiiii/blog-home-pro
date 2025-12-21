@@ -8,8 +8,8 @@
  */
 // import axios from "axios";
 import fetchJsonp from "fetch-jsonp";
-import fs from 'fs';  // 用于读写文件
-import path from 'path';  // 用于文件路径操作
+// import fs from 'fs';  // 用于读写文件
+// import path from 'path';  // 用于文件路径操作
 /**
  * 音乐播放器
  */
@@ -63,23 +63,59 @@ export const getPlayerList = async (server, type, id) => {
  * 天气
  */
 
-// 获取高德地理位置信息
-export const getAdcode = async (key) => {
-  const res = await fetch(`https://restapi.amap.com/v3/ip?key=${key}`);
-  return await res.json();
-};
-
-// 获取高德地理天气信息
-export const getWeather = async (key, city) => {
-  const res = await fetch(
-    `https://restapi.amap.com/v3/weather/weatherInfo?key=${key}&city=${city}`,
-  );
-  return await res.json();
-};
+// utils/api.js
+/**
+ * 封装fetch请求
+ * @param {string} url 
+ * @param {object} options 
+ * @returns {Promise}
+ */
 
 // 获取教书先生天气 API
 // https://api.oioweb.cn/doc/weather/GetWeather
-export const getOtherWeather = async () => {
-  const res = await fetch("https://api.oioweb.cn/api/weather/GetWeather");
-  return await res.json();
+// export const getOtherWeather = async () => {
+//   const res = await fetch("https://api.oioweb.cn/api/weather/GetWeather");
+//   return await res.json();
+// };
+
+
+// 百度地图API封装
+// api/index.js
+const WORKER_BASE_URL = 'https://weather.fwneko.com'; // 你的 Worker 地址
+
+// 获取用户 IP 定位
+export const getLocationByIP = async () => {
+  const res = await fetch(`${WORKER_BASE_URL}/api/location`);
+  const data = await res.json();
+
+  if (data.status !== 0 || !data.content?.address_detail) {
+    throw new Error('IP定位失败');
+  }
+
+  return {
+    city: data.content.address_detail.city,
+    district: data.content.address_detail.district,
+    adcode: data.content.address_detail.adcode,
+    cityCode: data.content.address_detail.city_code,
+    point: data.content.point
+  };
 };
+
+// 获取当前天气
+export const getNowWeather = async (districtId) => {
+  const res = await fetch(`${WORKER_BASE_URL}/api/weather?district_id=${districtId}`);
+  const data = await res.json();
+
+  if (data.status !== 0 || !data.result || !data.result.now) {
+    throw new Error(data.message || '天气查询失败或数据格式不完整');
+  }
+
+  const now = data.result.now;
+  return {
+    text: now.text,
+    temp: now.temp,
+    windDir: now.wind_dir,
+    windScale: now.wind_class
+  };
+};
+

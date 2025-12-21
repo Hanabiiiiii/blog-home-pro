@@ -2,32 +2,32 @@
   {
     "icon": "Blog",
     "name": "博客",
-    "link": "https://blog.hanbaka.cn/"
+    "link": "https://blog.fwneko.com/"
   },
   {
     "icon": "LiveTvFilled",
     "name": "媒体",
-    "link": "https://tv.its-mygo.top"
+    "link": "https://tv.hanabi.xin"
   },
   {
     "icon": "Cloud",
     "name": "网盘",
-    "link": "https://pan.hanbaka.cn/"
+    "link": "https://pan.fwneko.com/"
   },
   {
     "icon": "CompactDisc",
     "name": "音乐",
-    "link": "https://music.hanbaka.cn/"
+    "link": "https://music.fwneko.com/"
   },
   {
     "icon": "Book",
     "name": "网址集",
-    "link": "https://web.hanbaka.cn/"
+    "link": "https://web.fwneko.com/"
   },
 
   {
     "icon": "LaptopCode",
     "name": "站点监测",
-    "link": "https://status.hanbaka.cn/"
+    "link": "https://status.fwneko.com/"
   }
 ]

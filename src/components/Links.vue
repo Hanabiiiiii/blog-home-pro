@@ -42,7 +42,6 @@
 
 <script setup>
 import { Icon } from "@vicons/utils";
-import { defineComponent } from 'vue';
 // 可前往 https://www.xicons.org 自行挑选并在此处引入
 import { Link, Blog, CompactDisc, Cloud, Compass, Book, Fire, LaptopCode } from "@vicons/fa"; // 注意使用正确的类别
 import { LiveTvTwotone,LiveTvFilled} from "@vicons/material"; // 注意使用正确的类别

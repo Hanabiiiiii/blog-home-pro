@@ -100,6 +100,7 @@ export default ({ mode }) =>
             target: 'https://v1.hitokoto.cn',
             changeOrigin: true,
             rewrite: (path) => path.replace(/^\/api/, ''),
+            
           },
         },
       },

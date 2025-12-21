@@ -24,6 +24,8 @@
           &amp;
           {{ siteIcp }}
         </a>
+        &
+        <a href="https://icp.gov.moe/?keyword=20250196" target="_blank">萌ICP备20250196号</a>
       </div>
       <div v-else class="lrc">
         <Transition name="fade" mode="out-in">
@@ -35,13 +37,6 @@
         </Transition>
       </div>
     </Transition>
-
-    <!-- 新增：右侧链接 -->
-    <div class="footer-right">
-      <a href="https://www.qyyhl.com/aff/ESHBGWYG" target="_blank" class="active">
-        <img src="https://img.shields.io/badge/本站由清羽云CDN提供加速防御支持-green?style=flat&logo=Claris" alt="加速支持" />
-      </a>
-    </div>
   </footer>
 </template>
 
@@ -58,7 +53,7 @@ const siteIcp = ref(import.meta.env.VITE_SITE_ICP);
 const siteAnthor = ref(import.meta.env.VITE_SITE_ANTHOR);
 const siteUrl = computed(() => {
   const url = import.meta.env.VITE_SITE_URL;
-  if (!url) return "https://www.imsyy.top";
+  if (!url) return "https://www.hanbaka.cn";
   // 判断协议前缀
   if (!url.startsWith("http://") && !url.startsWith("https://")) {
     return "//" + url;

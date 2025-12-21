@@ -56,7 +56,7 @@
 </template>
 
 <script setup>
-import { CloseOne, SettingTwo, GithubOne, AddOne, Bug } from "@icon-park/vue-next";
+import { CloseOne, SettingTwo, GithubOne, } from "@icon-park/vue-next";
 import { mainStore } from "@/store";
 import Set from "@/components/Set.vue";
 import config from "@/../package.json";

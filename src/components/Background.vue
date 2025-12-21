@@ -6,7 +6,7 @@
       class="bg"
       alt="cover"
       @load="imgLoadComplete"
-      @error.once="imgLoadError"
+      @error="imgLoadError"
       @animationend="imgAnimationEnd"
     />
     <div :class="store.backgroundShow ? 'gray hidden' : 'gray'" />
@@ -25,6 +25,8 @@
 
 <script setup>
 import { mainStore } from "@/store";
+import { h, ref, watch, onMounted, onBeforeUnmount } from "vue";
+import { ElMessage } from "element-plus";
 import { Error } from "@icon-park/vue-next";
 
 const store = mainStore();
@@ -32,66 +34,98 @@ const bgUrl = ref(null);
 const imgTimeout = ref(null);
 const emit = defineEmits(["loadComplete"]);
 
-// 壁纸随机数
-// 请依据文件夹内的图片个数修改 Math.random() 后面的第一个数字
+// 随机本地图背景
 const bgRandom = Math.floor(Math.random() * 10 + 1);
 
-// 更换壁纸链接
+// 主备图源尝试机制
+const tryUrls = ref([]);
+const currentTryIndex = ref(0);
+
+const trySetBg = (urls) => {
+  tryUrls.value = urls;
+  currentTryIndex.value = 0;
+  tryLoadUrl();
+};
+
+const tryLoadUrl = () => {
+  const url = tryUrls.value[currentTryIndex.value];
+  const img = new Image();
+  img.onload = () => {
+    bgUrl.value = url;
+  };
+  img.onerror = () => {
+    currentTryIndex.value++;
+    if (currentTryIndex.value < tryUrls.value.length) {
+      tryLoadUrl(); // 尝试下一个接口
+    } else {
+      // 全部失败，使用本地默认图
+      bgUrl.value = `/images/background${bgRandom}.jpg`;
+    }
+  };
+  img.src = url;
+};
+
+// 更换壁纸逻辑
 const changeBg = (type) => {
   if (type == 0) {
     bgUrl.value = `/images/background${bgRandom}.jpg`;
   } else if (type == 1) {
-    bgUrl.value = "https://bing.img.run/1920x1080.php";
+    // Bing 高清壁纸
+    trySetBg([
+      "https://bing.img.run/1920x1080.php",
+      "https://api.xsot.cn/bing?jump=true",
+    ]);
   } else if (type == 2) {
-    bgUrl.value = "https://bing.img.run/rand.php";
+    // Bing 随机壁纸
+    trySetBg([
+      "https://bing.img.run/rand.php",
+      "https://api.btstu.cn/sjbz/api.php?lx=fengjing&format=images",
+    ]);
   } else if (type == 3) {
-    bgUrl.value = "https://acg-api.97hjh.cn/img.php";
+    // 动漫类壁纸
+    trySetBg([
+      "https://api.btstu.cn/sjbz/api.php?lx=dongman&format=images",
+      "https://api.mtyqx.cn/api/random.php",
+    ]);
   }
 };
 
 // 图片加载完成
 const imgLoadComplete = () => {
-  imgTimeout.value = setTimeout(
-    () => {
-      store.setImgLoadStatus(true);
-    },
-    Math.floor(Math.random() * (600 - 300 + 1)) + 300,
-  );
+  imgTimeout.value = setTimeout(() => {
+    store.setImgLoadStatus(true);
+  }, Math.floor(Math.random() * (600 - 300 + 1)) + 300);
 };
 
-// 图片动画完成
+// 动画完成
 const imgAnimationEnd = () => {
   console.log("壁纸加载且动画完成");
-  // 加载完成事件
   emit("loadComplete");
 };
 
-// 图片显示失败
+// 图片加载失败提示（无需再切换 bgUrl）
 const imgLoadError = () => {
-  console.error("壁纸加载失败：", bgUrl.value);
+  console.error("壁纸加载失败，尝试备用地址中：", tryUrls.value[currentTryIndex.value]);
   ElMessage({
-    message: "壁纸加载失败，已临时切换回默认",
-    icon: h(Error, {
-      theme: "filled",
-      fill: "#efefef",
-    }),
+    message: "壁纸加载失败，正在尝试备用地址...",
+    icon: h(Error, { theme: "filled", fill: "#efefef" }),
   });
-  bgUrl.value = `/images/background${bgRandom}.jpg`;
 };
 
-// 监听壁纸切换
+// 监听壁纸类型切换
 watch(
   () => store.coverType,
   (value) => {
     changeBg(value);
-  },
+  }
 );
 
+// 初始加载
 onMounted(() => {
-  // 加载壁纸
   changeBg(store.coverType);
 });
 
+// 清理超时
 onBeforeUnmount(() => {
   clearTimeout(imgTimeout.value);
 });
@@ -120,12 +154,11 @@ onBeforeUnmount(() => {
     object-fit: cover;
     backface-visibility: hidden;
     filter: blur(20px) brightness(0.3);
-    transition:
-      filter 0.3s,
-      transform 0.3s;
+    transition: filter 0.3s, transform 0.3s;
     animation: fade-blur-in 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
     animation-delay: 0.45s;
   }
+
   .gray {
     opacity: 1;
     position: absolute;
@@ -135,13 +168,14 @@ onBeforeUnmount(() => {
     height: 100%;
     background-image: radial-gradient(rgba(0, 0, 0, 0) 0, rgba(0, 0, 0, 0.5) 100%),
       radial-gradient(rgba(0, 0, 0, 0) 33%, rgba(0, 0, 0, 0.3) 166%);
-
     transition: 1.5s;
+
     &.hidden {
       opacity: 0;
       transition: 1.5s;
     }
   }
+
   .down {
     font-size: 16px;
     color: white;
@@ -159,10 +193,12 @@ onBeforeUnmount(() => {
     display: flex;
     justify-content: center;
     align-items: center;
+
     &:hover {
       transform: scale(1.05);
       background-color: #00000060;
     }
+
     &:active {
       transform: scale(1);
     }
