@@ -3,14 +3,14 @@
     <template v-if="loading">
       <span>加载中...</span>
     </template>
-    <template v-else-if="weatherData.city && weatherData.weather.weather">
+    <template v-else-if="weatherData.city && weatherData.weather.text">
       <span>{{ weatherData.city }}&nbsp;</span>
-      <span>{{ weatherData.weather.weather }}&nbsp;</span>
+      <span>{{ weatherData.weather.text }}&nbsp;</span>
       <span>{{ weatherData.weather.temperature }}℃</span>
       <span class="sm-hidden">
-        &nbsp;{{ formatWindDirection(weatherData.weather.winddirection) }}&nbsp;
+        &nbsp;{{ formatWindDirection(weatherData.weather.windDirection) }}&nbsp;
       </span>
-      <span class="sm-hidden">{{ weatherData.weather.windpower }}级</span>
+      <span class="sm-hidden">{{ weatherData.weather.windPower }}级</span>
     </template>
     <template v-else>
       <span>天气数据获取失败</span>
@@ -22,7 +22,7 @@
 import { ref, reactive, onMounted, h } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Error } from '@icon-park/vue-next'
-import { getLocationByIP, getNowWeather } from '@/api'
+import {  getNowWeather } from '@/api'
 
 // 天气数据加载状态
 const loading = ref(true)
@@ -30,12 +30,11 @@ const loading = ref(true)
 // 天气数据
 const weatherData = reactive({
   city: null,
-  adcode: null,
   weather: {
-    weather: null,
+    text: null,
     temperature: null,
-    winddirection: null,
-    windpower: null
+    windDirection: null,
+    windPower: null
   }
 })
 
@@ -49,19 +48,17 @@ const getWeatherData = async () => {
   try {
     loading.value = true
 
-    // 通过 Worker 获取 IP 定位
-    const location = await getLocationByIP()
-    weatherData.city = location.city || '当前位置'
-    weatherData.adcode = location.adcode || '131'
-    // console.log('定位信息:', location)
+    // 直接从 Worker 获取天气（Worker 内部已做定位）
+    const weather = await getNowWeather()
 
-    // 通过 Worker 获取当前天气
-    const weather = await getNowWeather(weatherData.adcode)
+    weatherData.city = weather.city || '未知地区'
     weatherData.weather = {
-      weather: weather.text,
+      text: weather.text,
       temperature: weather.temp,
-      winddirection: weather.windDir,
-      windpower: weather.windScale ? weather.windScale.replace('级', '') : '--'
+      windDirection: weather.windDir,
+      windPower: weather.windScale
+        ? weather.windScale.replace('级', '')
+        : '--'
     }
 
   } catch (error) {
@@ -71,6 +68,7 @@ const getWeatherData = async () => {
     loading.value = false
   }
 }
+
 
 // 弹窗错误提示
 const onError = (message) => {

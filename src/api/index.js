@@ -79,43 +79,23 @@ export const getPlayerList = async (server, type, id) => {
 // };
 
 
-// 百度地图API封装
 // api/index.js
-const WORKER_BASE_URL = 'https://weather.fwneko.com'; // 你的 Worker 地址
+const WORKER_BASE_URL = "https://weather.fwneko.com";
 
-// 获取用户 IP 定位
-export const getLocationByIP = async () => {
-  const res = await fetch(`${WORKER_BASE_URL}/api/location`);
+export const getNowWeather = async () => {
+  const res = await fetch(`${WORKER_BASE_URL}/api/weather`);
   const data = await res.json();
 
-  if (data.status !== 0 || !data.content?.address_detail) {
-    throw new Error('IP定位失败');
+  if (data.status !== 0 || !data.now) {
+    throw new Error(data.message || "天气获取失败");
   }
 
   return {
-    city: data.content.address_detail.city,
-    district: data.content.address_detail.district,
-    adcode: data.content.address_detail.adcode,
-    cityCode: data.content.address_detail.city_code,
-    point: data.content.point
-  };
-};
-
-// 获取当前天气
-export const getNowWeather = async (districtId) => {
-  const res = await fetch(`${WORKER_BASE_URL}/api/weather?district_id=${districtId}`);
-  const data = await res.json();
-
-  if (data.status !== 0 || !data.result || !data.result.now) {
-    throw new Error(data.message || '天气查询失败或数据格式不完整');
-  }
-
-  const now = data.result.now;
-  return {
-    text: now.text,
-    temp: now.temp,
-    windDir: now.wind_dir,
-    windScale: now.wind_class
+    city: data.city,
+    text: data.now.text,
+    temp: data.now.temp,
+    windDir: data.now.wind_dir,
+    windScale: data.now.wind_class
   };
 };
 
