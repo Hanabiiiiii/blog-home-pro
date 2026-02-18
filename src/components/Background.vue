@@ -21,6 +21,7 @@
       </a>
     </Transition>
   </div>
+
 </template>
 
 <script setup>
@@ -46,7 +47,9 @@ const trySetBg = (urls) => {
   tryLoadUrl();
 };
 const tryLoadUrl = () => {
-  const url = tryUrls.value[currentTryIndex.value];
+  const rawUrl = tryUrls.value[currentTryIndex.value];
+  const url = rawUrl + (rawUrl.includes("?") ? "&" : "?") + "t=" + Date.now();
+
   const img = new Image();
   img.onload = () => {
     bgUrl.value = url;
@@ -55,15 +58,22 @@ const tryLoadUrl = () => {
     currentTryIndex.value++;
     if (currentTryIndex.value < tryUrls.value.length) {
       imgTry();
-      tryLoadUrl(); // 尝试下一个接口
+      tryLoadUrl();
     } else {
-      // 全部失败，使用本地默认图
-      // bgUrl.value = `/images/background${bgRandom}.jpg`;
       imgLoadError();
     }
   };
   img.src = url;
 };
+const getP2xRandom = () => {
+  const isH = window.innerWidth >= window.innerHeight;
+  const type = isH ? "h" : "v";
+  const max = isH ? 1074 : 4003; // 你 random.js 里的 counts
+
+  const num = Math.floor(Math.random() * max) + 1;
+  return `https://p.2x.nz/ri/${type}/${num}.webp`;
+};
+
 const changeBg = (type) => {
   if (type == 0) {
     bgUrl.value = `/images/background${bgRandom}.jpg`;
@@ -79,15 +89,42 @@ const changeBg = (type) => {
       "https://api.vvhan.com/api/wallpaper/views",
       "https://bing.img.run/rand.php",
     ]);
-  } else if (type == 3) {
-    // 动漫类壁纸
-    trySetBg([
-      "https://eopfapi.acofork.com/pic?img=ua",
-      "https://api.btstu.cn/sjbz/api.php?lx=dongman&format=images",
-      "https://api.mtyqx.cn/api/random.php",
-    ]);
-  }
+} else if (type == 3) {
+  // 动漫类壁纸（横竖屏自适应）
+  trySetBg([
+    getP2xRandom(),
+    "https://api.mtyqx.cn/api/random.php",
+    "https://api.r10086.com/樱道随机图片api接口.php?自适应图片系列=原神",
+  ]);
+}
 };
+let resizeTimer = null;
+let lastIsH = window.innerWidth >= window.innerHeight;
+
+const onResize = () => {
+  if (store.coverType != 3) return;
+
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    const nowIsH = window.innerWidth >= window.innerHeight;
+
+    // 横竖屏没变，不换
+    if (nowIsH === lastIsH) return;
+
+    lastIsH = nowIsH;
+    changeBg(3);
+  }, 200);
+};
+
+onMounted(() => {
+  window.addEventListener("resize", onResize);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener("resize", onResize);
+  clearTimeout(resizeTimer);
+});
+
 
 // 图片加载完成
 const imgLoadComplete = () => {
